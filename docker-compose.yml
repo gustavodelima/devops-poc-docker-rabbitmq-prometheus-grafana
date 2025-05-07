@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  logicus-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: logicus-rabbitmq
+    ports:
+      - "15672:15672"  
+      - "5672:5672"    
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    networks:
+      - logicus-net
+
+  logicus-prometheus:
+    image: prom/prometheus
+    container_name: logicus-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - logicus-net
+
+  logicus-grafana:
+    image: grafana/grafana
+    container_name: logicus-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/alerting:/etc/grafana/provisioning/alerting
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-metricsdrilldown-app,grafana-pyroscope-app
+
+    networks:
+      - logicus-net
+    depends_on:
+      - logicus-prometheus
+
+networks:
+  logicus-net:
+    driver: bridge

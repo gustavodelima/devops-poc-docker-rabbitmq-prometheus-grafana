@@ -1,0 +1,37 @@
+{
+    "uid": "logicus-rabbitmq",
+    "title": "Logicus RabbitMQ",
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Mensagens publicadas",
+        "id": 1,
+        "targets": [
+          {
+            "expr": "rate(rabbitmq_queue_messages_published_total[1m])",
+            "interval": "",
+            "legendFormat": "{{queue}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Mensagens nas filas",
+        "id": 2,
+        "targets": [
+          {
+            "expr": "rabbitmq_queue_messages_ready",
+            "interval": "",
+            "legendFormat": "{{queue}}",
+            "refId": "B"
+          }
+        ]
+      }
+    ]
+  }
+  

@@ -1,0 +1,51 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: Logicus RabbitMQ Alerts
+    folder: Logicus
+    interval: 30s
+    rules:
+      - uid: logicus-queue-alert
+        title: Fila cheia (RabbitMQ)
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: rabbitmq_queue_messages_ready
+              interval: ""
+              legendFormat: "{{queue}}"
+              refId: A
+              format: time_series
+              intervalFactor: 1
+              datasource:
+                type: prometheus
+                uid: prometheus
+
+          - refId: B
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: max_over_time(rabbitmq_queue_messages_ready[1m]) > 100
+              interval: ""
+              legendFormat: "max filas em 1m > 100"
+              refId: B
+              format: time_series
+              intervalFactor: 1
+              datasource:
+                type: prometheus
+                uid: prometheus
+
+        annotations:
+          summary: "Fila com mais de 100 mensagens"
+          description: "A fila do RabbitMQ está acumulando mensagens além do normal."
+        noDataState: NoData
+        execErrState: Alerting
+        for: 1m
+        isPaused: false
